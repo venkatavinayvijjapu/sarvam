@@ -106,3 +106,7 @@
 2024-09-17 16:10:58,180 - sentence_transformers.SentenceTransformer - INFO - __init__ - 197- Load pretrained SentenceTransformer: all-MiniLM-L6-v2
 2024-09-17 16:11:15,487 - sentence_transformers.SentenceTransformer - INFO - __init__ - 189- Use pytorch device_name: cpu
 2024-09-17 16:11:15,487 - sentence_transformers.SentenceTransformer - INFO - __init__ - 197- Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2024-09-17 16:16:25,613 - sentence_transformers.SentenceTransformer - INFO - __init__ - 189- Use pytorch device_name: cpu
+2024-09-17 16:16:25,613 - sentence_transformers.SentenceTransformer - INFO - __init__ - 197- Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2024-09-17 16:16:34,296 - sentence_transformers.SentenceTransformer - INFO - __init__ - 189- Use pytorch device_name: cpu
+2024-09-17 16:16:34,296 - sentence_transformers.SentenceTransformer - INFO - __init__ - 197- Load pretrained SentenceTransformer: all-MiniLM-L6-v2

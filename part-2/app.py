@@ -54,11 +54,7 @@ if "payload" not in st.session_state:
         "api-subscription-key": "3549d7f1-cbc8-49d5-bb04-0e0d5b778578",
         "Content-Type": "application/json"
     }
-def play_wav_file(filename):
-    audio = AudioSegment.from_wav(filename)
-    playback_obj = sa.play_buffer(audio.raw_data, num_channels=audio.channels, bytes_per_sample=audio.sample_width, sample_rate=audio.frame_rate)
-    # playback_obj.wait_done()
-# Google Search Tool
+
 
 with st.sidebar:
     file_uploader = st.file_uploader("Upload your file:", type=["pdf"])
@@ -159,8 +155,6 @@ if query := st.chat_input("Enter your query:"):
             wav_file.write(wav_data)
         autoplay_audio('query.wav')
         
-        # os.remove('query.wav')
-        # print(f"File '{'query.wav'}' has been removed.")
-      
+       
         
         st.session_state.messages.append({"role": "assistant", "content": result['output']})
