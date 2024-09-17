@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -19,6 +12,11 @@ from langchain.agents import AgentExecutor
 from gpt_utils import *
 from prompt import *
 import pyttsx3 
+import json
+from pydub import AudioSegment
+from pydub.playback import play
+import simpleaudio as sa
+import base64
 # from deep_translator import GoogleTranslator
 
 # Load environment variables
@@ -39,24 +37,27 @@ converter.setProperty('volume', 0.7)
 
 import requests
 
-url = "https://api.sarvam.ai/text-to-speech"
+speech_url = "https://api.sarvam.ai/text-to-speech"
 if "payload" not in st.session_state:
     st.session_state.payload = {
-        "inputs": [None],
-        "target_language_code": "en-IN",
-        "speaker": "meera",
-        "pitch": 25,
-        "pace": 25,
-        "loudness": 60,
-        "speech_sample_rate": 16000,
-        "enable_preprocessing": True,
-        "model": "bulbul:v1"
-    }
+    "inputs": ["The weather is sunny."],
+    "target_language_code": "hi-IN",
+    "speaker": "meera",
+    "pitch": 0,
+    "pace": 1.65,
+    "loudness": 1.5,
+    "speech_sample_rate": 8000,
+    "enable_preprocessing": True,
+    "model": "bulbul:v1"
+}
     st.session_state.headers = {
         "api-subscription-key": "3549d7f1-cbc8-49d5-bb04-0e0d5b778578",
         "Content-Type": "application/json"
     }
-
+def play_wav_file(filename):
+    audio = AudioSegment.from_wav(filename)
+    playback_obj = sa.play_buffer(audio.raw_data, num_channels=audio.channels, bytes_per_sample=audio.sample_width, sample_rate=audio.frame_rate)
+    # playback_obj.wait_done()
 # Google Search Tool
 
 with st.sidebar:
@@ -92,6 +93,17 @@ if "google_tool" not in st.session_state:
 if "prompt" not in st.session_state:
     st.session_state.prompt = get_prompt()
 
+def autoplay_audio(file_path: str):
+    with open(file_path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode("utf-8")
+    md = f"""
+    <audio autoplay>
+    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+    </audio>
+    """
+    st.markdown(md, unsafe_allow_html=True)
+
 # Create the LangChain agent
 if "agent_executor" not in st.session_state:
     llm = ChatOpenAI(api_key=OPENAI_API_KEY)
@@ -103,9 +115,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
     with st.chat_message('assistant'):
         st.markdown("Hey Hii...! How can I help you.")
-        converter.say('Hey Hii...! How can I help you.') 
-        converter.runAndWait()
+        st.session_state.payload["inputs"]=['Hey Hii...! How can I help you.']
+        autoplay_audio('output.wav')
 
+       
 
 
 for message in st.session_state.messages:
@@ -132,11 +145,22 @@ if query := st.chat_input("Enter your query:"):
         result = st.session_state.agent_executor.invoke({"input": query})
         st.markdown(result['output'])
         st.session_state.payload["inputs"]=[result['output']]
-        response = requests.request("POST", url, json=st.session_state.payload, headers=st.session_state.headers)
+        response = requests.request("POST", speech_url, json=st.session_state.payload, headers=st.session_state.headers)
 
         print(response.text)
-        converter.say(result['output']) 
-        converter.runAndWait()
-        # st.markdown(result)
+        json_data = json.loads(response.text)
+        print(json_data)
+        base64_string = json_data["audios"][0]
+        # Decode the base64 string
+        wav_data = base64.b64decode(base64_string)
+
+        # Write the decoded data to a WAV file
+        with open("query.wav", "wb") as wav_file:
+            wav_file.write(wav_data)
+        autoplay_audio('query.wav')
+        
+        # os.remove('query.wav')
+        # print(f"File '{'query.wav'}' has been removed.")
+      
         
         st.session_state.messages.append({"role": "assistant", "content": result['output']})

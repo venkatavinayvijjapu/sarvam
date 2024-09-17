@@ -16,7 +16,7 @@ def web_tool():
     web_search = WebSearchAPIWrapper()
     web_tool = StructuredTool.from_function(
         name="web-search",
-        description="Search web data for information",
+        description="Searches in URL data to get the relavent chunk based on the  user-query.",
         func=web_search.run
     )
     return web_tool
@@ -25,7 +25,7 @@ def pdf_tool():
     pdf_search = PDFSearchAPIWrapper()
     pdf_tool = StructuredTool.from_function(
         name="pdf-search",
-        description="Search PDF for relevant information",
+        description="Searches in pdf to get the relavent chunk based on the  user-query. ",
         func=pdf_search.run
     )
     return pdf_tool
